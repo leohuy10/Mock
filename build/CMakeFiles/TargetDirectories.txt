@@ -1,8 +1,0 @@
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/shfihew.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/edit_cache.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/rebuild_cache.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/list_install_components.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/install.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/install/local.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/install/strip.dir
-/home/quang/WORKSPACE/CPP/FPT_Trainning/Mock-huy/build/CMakeFiles/shfihew_autogen.dir
