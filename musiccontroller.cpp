@@ -345,10 +345,13 @@ void MusicController::playTrack(int index)
     }
 }
 
+
+// Clears existing data, registers 10 demo tracks, and triggers a UI refresh signal.
 void MusicController::loadDemoPlaylist()
 {
     playlist.clear();
     
+    // Bài 1
     ExtendedSong song1;
     song1.id = 1;
     song1.title = "Summer Nights";
@@ -359,6 +362,7 @@ void MusicController::loadDemoPlaylist()
     playlist.append(song1);
     musicLibrary.addSong(song1);
     
+    // Bài 2
     ExtendedSong song2;
     song2.id = 2;
     song2.title = "Highway Dreams";
@@ -368,7 +372,95 @@ void MusicController::loadDemoPlaylist()
     song2.filePath = "";
     playlist.append(song2);
     musicLibrary.addSong(song2);
-    
+   
+    // Bài 3
+    ExtendedSong song3;
+    song3.id = 3;
+    song3.title = "Neon Lights";
+    song3.artist = "Synth City";
+    song3.album = "Cyberpunk 2077";
+    song3.duration = 245;
+    song3.filePath = "";
+    playlist.append(song3);
+    musicLibrary.addSong(song3);
+
+    // Bài 4
+    ExtendedSong song4;
+    song4.id = 4;
+    song4.title = "Midnight City";
+    song4.artist = "M83";
+    song4.album = "Hurry Up";
+    song4.duration = 243;
+    song4.filePath = "";
+    playlist.append(song4);
+    musicLibrary.addSong(song4);
+
+    // Bài 5
+    ExtendedSong song5;
+    song5.id = 5;
+    song5.title = "Blinding Lights";
+    song5.artist = "The Weeknd";
+    song5.album = "After Hours";
+    song5.duration = 200;
+    song5.filePath = "";
+    playlist.append(song5);
+    musicLibrary.addSong(song5);
+
+    // Bài 6
+    ExtendedSong song6;
+    song6.id = 6;
+    song6.title = "Levitating";
+    song6.artist = "Dua Lipa";
+    song6.album = "Future Nostalgia";
+    song6.duration = 203;
+    song6.filePath = "";
+    playlist.append(song6);
+    musicLibrary.addSong(song6);
+
+    // Bài 7
+    ExtendedSong song7;
+    song7.id = 7;
+    song7.title = "Shape of You";
+    song7.artist = "Ed Sheeran";
+    song7.album = "Divide";
+    song7.duration = 233;
+    song7.filePath = "";
+    playlist.append(song7);
+    musicLibrary.addSong(song7);
+
+    // Bài 8
+    ExtendedSong song8;
+    song8.id = 8;
+    song8.title = "Heat Waves";
+    song8.artist = "Glass Animals";
+    song8.album = "Dreamland";
+    song8.duration = 238;
+    song8.filePath = "";
+    playlist.append(song8);
+    musicLibrary.addSong(song8);
+
+    // Bài 9
+    ExtendedSong song9;
+    song9.id = 9;
+    song9.title = "Cold Heart";
+    song9.artist = "Elton John";
+    song9.album = "The Lockdown";
+    song9.duration = 202;
+    song9.filePath = "";
+    playlist.append(song9);
+    musicLibrary.addSong(song9);
+
+    // Bài 10
+    ExtendedSong song10;
+    song10.id = 10;
+    song10.title = "Save Your Tears";
+    song10.artist = "The Weeknd";
+    song10.album = "After Hours";
+    song10.duration = 215;
+    song10.filePath = "";
+    playlist.append(song10);
+    musicLibrary.addSong(song10);
+
     emit playlistChanged();
 }
 
