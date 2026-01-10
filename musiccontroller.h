@@ -31,6 +31,11 @@ class MusicController : public QObject
     Q_PROPERTY(QStringList playlistItems READ getPlaylistItems NOTIFY playlistChanged)
     Q_PROPERTY(int currentTrackIndex READ getCurrentTrackIndex WRITE setCurrentTrackIndex NOTIFY currentTrackIndexChanged)
 
+    enum FilterMode {
+        ShowAll,
+        ShowQueue
+    };
+
 public:
     explicit MusicController(QObject *parent = nullptr);
     ~MusicController();
@@ -55,6 +60,11 @@ public:
     void setCurrentTrackIndex(int index);
 
 public slots:
+    void search(const QString &text);
+    void setFilterMode(int mode);
+    void addToQueue(int songId);
+    int getSongIdAt(int index) const;
+
     // Playback control
     void playPause();
     void stop();
@@ -109,6 +119,11 @@ private:
     bool isShuffle;
     bool isRepeat;
     int currentVolume;
+
+    // FIlter
+    FilterMode currentMode = ShowAll;
+    QVector<ExtendedSong> queueList;
+    QVector<ExtendedSong> manualQueue; // ds hang cho thu cong
 };
 
 #endif // MUSICCONTROLLER_H

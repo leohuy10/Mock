@@ -52,6 +52,14 @@ std::vector<Song *> MusicLibrary::findSongByArtist(const std::string &artist) co
     return {};
 }
 
+Song* MusicLibrary::findSongByTitle(const std::string &title) const {
+    auto it = songIndexByTitle.find(title);
+    if(it != songIndexByTitle.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
 const Song *MusicLibrary::getSongByIndex(size_t index) const
 {
     if (index >= songs.size())

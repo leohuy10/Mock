@@ -207,10 +207,47 @@ ApplicationWindow {
                 color: colorText
                 font.pixelSize: 16
                 padding: 12
+
+                onTextChanged: {
+                    musicController.search(text);
+                }
+
                 background: Rectangle {
                     color: colorBg3
                     radius: 12
                     border.color: searchBar.activeFocus ? colorPrimary : "transparent"
+                }
+
+                Button {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 5
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "✕"
+                    visible: searchBar.text !== ""
+                    flat: true
+                    onClicked: {
+                        searchBar.text = ""
+                        musicController.search("") // Reset lại playlist đầy đủ
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 10
+
+                Button {
+                    text: "Tất cả"
+                    highlighted: musicController.filterMode === 0 // Giả sử bạn tạo property
+                    onClicked: musicController.setFilterMode(0)
+                    Layout.fillWidth: true
+                }
+
+                Button {
+                    text: "Hàng chờ (Queue)"
+                    highlighted: musicController.filterMode === 1
+                    onClicked: musicController.setFilterMode(1)
+                    Layout.fillWidth: true
                 }
             }
 
@@ -247,14 +284,34 @@ ApplicationWindow {
                         }
                         contentItem: RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 15
-                            anchors.rightMargin: 15
+                            anchors.leftMargin: 10
+                            anchors.rightMargin: 10
                             spacing: 15
-                            Text { text: (index + 1); color: colorPrimary; opacity: 0.5; Layout.preferredWidth: 25; verticalAlignment: Text.AlignVCenter }
-                            Text { text: modelData; color: colorText; Layout.fillWidth: true; elide: Text.ElideRight; verticalAlignment: Text.AlignVCenter }
+                            Text { text: (index + 1); color: colorPrimary; opacity: 0.5; Layout.preferredWidth: 25; }
+                            Text { text: modelData; color: colorText; Layout.fillWidth: true; elide: Text.ElideRight;}
                             Text { 
                                 text: "..."; visible: playlistView.currentIndex === index; color: colorPrimary; font.pixelSize: 32;
-                                bottomPadding: 20
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: contextMenu.open()
+                                }
+
+                                Menu {
+                                    id: contextMenu
+                                    y: parent.height
+
+                                    MenuItem {
+                                        text: "Thêm vào hàng chờ"
+                                        onTriggered: {
+                                            // Lấy ID thật từ C++ dựa trên vị trí đang bấm
+                                            var realId = musicController.getSongIdAt(index)
+                                            if (realId !== -1) {
+                                                musicController.addToQueue(realId)
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         onClicked: {

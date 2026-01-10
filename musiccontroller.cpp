@@ -302,12 +302,41 @@ void MusicController::onMediaPlayerStateChanged(QMediaPlayer::PlaybackState stat
 
 void MusicController::onPlaybackEnded()
 {
+    // --- ƯU TIÊN CAO NHẤT: HÀNG CHỜ THỦ CÔNG (Queue) ---
+    if (!manualQueue.isEmpty()) {
+        // Lấy bài hát đầu tiên trong hàng chờ ra để phát
+        ExtendedSong nextInQueue = manualQueue.takeFirst();
+        
+        // Tìm vị trí bài hát này trong playlist hiện tại để đồng bộ UI (nếu có)
+        bool found = false;
+        for (int i = 0; i < playlist.size(); ++i) {
+            if (playlist[i].id == nextInQueue.id) {
+                currentTrackIndex = i;
+                found = true;
+                break;
+            }
+        }
+        
+        // Phát bài hát từ hàng chờ
+        playTrack(currentTrackIndex);
+        emit currentTrackIndexChanged();
+
+        // Nếu người dùng đang nhìn tab Hàng chờ, cập nhật giao diện để xóa bài vừa phát
+        if (currentMode == ShowQueue) {
+            search(""); 
+        }
+        return; // Kết thúc hàm tại đây, không chạy xuống logic Repeat/Shuffle phía dưới
+    }
+
+    // --- LOGIC MẶC ĐỊNH (Chỉ chạy khi Queue trống) ---
     if (isRepeat) {
         playTrack(currentTrackIndex);
     } else if (isShuffle) {
-        currentTrackIndex = QRandomGenerator::global()->bounded(playlist.size());
-        playTrack(currentTrackIndex);
-        emit currentTrackIndexChanged();
+        if (playlist.size() > 0) {
+            currentTrackIndex = QRandomGenerator::global()->bounded(playlist.size());
+            playTrack(currentTrackIndex);
+            emit currentTrackIndexChanged();
+        }
     } else {
         if (currentTrackIndex < playlist.size() - 1) {
             next();
@@ -470,4 +499,87 @@ QString MusicController::formatTime(qint64 milliseconds) const
     int minutes = seconds / 60;
     int secs = seconds % 60;
     return QString("%1:%2").arg(minutes).arg(secs, 2, 10, QChar('0'));
+}
+
+void MusicController::search(const QString &text) {
+    // Luôn xóa danh sách hiển thị trước khi lọc mới
+    playlist.clear();
+    QString lowerQuery = text.toLower();
+
+    if (currentMode == ShowQueue) {
+        // --- CHẾ ĐỘ HÀNG CHỜ ---
+        // Chỉ duyệt trong danh sách manualQueue (những bài đã nhấn "Thêm vào hàng chờ")
+        for (const auto &song : manualQueue) {
+            QString title = QString::fromStdString(song.title).toLower();
+            QString artist = QString::fromStdString(song.artist).toLower();
+
+            // Nếu ô tìm kiếm trống -> Hiện hết Queue. Nếu có chữ -> Lọc trong Queue.
+            if (text.isEmpty() || title.contains(lowerQuery) || artist.contains(lowerQuery)) {
+                playlist.append(song);
+            }
+        }
+    } else {
+        // --- CHẾ ĐỘ TẤT CẢ (LIBRARY) ---
+        // Duyệt toàn bộ MusicLibrary (Kho 10 bài gốc hoặc 50.000 bài)
+        for (size_t i = 0; i < musicLibrary.size(); ++i) {
+            const Song* s = musicLibrary.getSongByIndex(i);
+            if (!s) continue;
+
+            QString title = QString::fromStdString(s->title).toLower();
+            QString artist = QString::fromStdString(s->artist).toLower();
+
+            if (text.isEmpty() || title.contains(lowerQuery) || artist.contains(lowerQuery)) {
+                ExtendedSong exSong;
+                exSong.id = s->id;
+                exSong.title = s->title;
+                exSong.artist = s->artist;
+                exSong.album = s->album;
+                exSong.duration = s->duration;
+                // exSong.filePath = s->filePath;
+                playlist.append(exSong);
+            }
+        }
+    }
+
+    emit playlistChanged(); // Cập nhật giao diện ListView
+}
+
+void MusicController::setFilterMode(int mode) {
+    currentMode = static_cast<FilterMode>(mode);
+    // Khi chuyển tab, ta reset lại hiển thị bằng cách gọi search với chuỗi rỗng
+    search(""); 
+}
+
+void MusicController::addToQueue(int songId) {
+    // 1. Tìm bài hát trong Library bằng ID
+    Song* s = musicLibrary.findSongByID(songId);
+    
+    if (s) {
+        ExtendedSong ex;
+        ex.id = s->id;
+        ex.title = s->title;
+        ex.artist = s->artist;
+        ex.album = s->album;
+        ex.duration = s->duration;
+        // ex.filePath = s->filePath;
+
+        // 2. Thêm vào danh sách chờ thủ công
+        manualQueue.append(ex);
+
+        // 3. QUAN TRỌNG: Nếu đang đứng ở tab "Hàng chờ", phải gọi search để cập nhật UI ngay
+        if (currentMode == ShowQueue) {
+            search(""); 
+        }
+        
+        qDebug() << "Đã thêm vào hàng chờ ID:" << songId << "Tổng cộng:" << manualQueue.size();
+    } else {
+        qDebug() << "Không tìm thấy bài hát với ID:" << songId;
+    }
+}
+
+int MusicController::getSongIdAt(int index) const {
+    if (index >= 0 && index < playlist.size()) {
+        return playlist[index].id;
+    }
+    return -1; // Không tìm thấy
 }
