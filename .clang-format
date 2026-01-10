@@ -1,0 +1,110 @@
+---
+# AUTOSAR C++14 Code Formatting Guidelines
+Language: Cpp
+Standard: C++14
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 4
+UseTab: Never
+TabWidth: 4
+IndentCaseLabels: true
+IndentGotoLabels: true
+
+# Line width
+ColumnLimit: 100
+
+# Pointer alignment
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Space settings
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInConditionalStatement: false
+SpacesInContainerLiterals: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Brace style
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeBraces: Allman
+BreakBeforeConceptDeclarations: true
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakStringLiterals: false
+
+# Function spacing
+SpaceBeforeFunctionDeclarationParen: false
+
+# Constructor initialization
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+ConstructorInitializerIndentWidth: 4
+
+# Operator overloading
+AlignOperands: AlignAfterOperator
+AlignConsecutiveAssignments: true
+AlignConsecutiveMacros: true
+
+# Include statements
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<(cstddef|cstdint|cstdlib|cassert|cmath|cstring|ctime|cwchar|ciso646|climits|cfloat|cstdio|cstdarg|cctype|cerrno|clocale|csignal|cstdio|cstring|cstdlib|ctime|cmath|cstring|cwchar|exception|memory|vector|array|string|map|set|queue|deque|list|stack|algorithm|numeric|functional|limits|atomic|thread|mutex|condition_variable|future|chrono|complex|random|valarray|iterator|initializer_list|typeinfo|type_traits|stdexcept|utility|new|memory|cxxabi|bits).*>'
+    Priority: 1
+  - Regex: '^<Q.*'
+    Priority: 2
+  - Regex: '.*'
+    Priority: 3
+
+# Maximum line length
+ReflowComments: true
+CommentPragmas: '^ IWYU pragma:'
+
+# Other
+AccessModifierOffset: -4
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: None
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: MultiLine
+BinPackArguments: false
+BinPackParameters: false
+BitFieldColonSpacing: Both
+FixNamespaceComments: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+Cpp11BracedListStyle: true
+DerivePointerAlignment: false
+SortIncludes: true
+SortUsingDeclarations: true

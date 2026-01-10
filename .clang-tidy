@@ -1,0 +1,71 @@
+---
+# clang-tidy configuration for AUTOSAR C++14 Guidelines and ISO 26262 compliance
+
+Checks: |
+  -* ,
+  readability-* ,
+  bugprone-* ,
+  performance-* ,
+  cppcoreguidelines-* ,
+  -cppcoreguidelines-pro-type-reinterpret-cast ,
+  -cppcoreguidelines-pro-type-union-access ,
+  modernize-* ,
+  -modernize-use-trailing-return-type ,
+  google-* ,
+  -google-runtime-references ,
+  clang-analyzer-* ,
+  -clang-analyzer-cplusplus.NewDelete ,
+  cert-* ,
+  -cert-err58-cpp ,
+  concurrency-* ,
+  portability-* ,
+  abseil-* ,
+  autosar-* ,
+  altera-* ,
+  boost-* ,
+  fuchsia-* ,
+  hicpp-* ,
+  llvm-* ,
+  -llvm-include-order ,
+  misc-* ,
+  -misc-unused-parameters ,
+  objc-* ,
+  openmp-* ,
+  zircon-*
+
+CheckOptions:
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+  - key: readability-identifier-naming.VariableCase
+    value: lower_case
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: "_"
+  - key: readability-identifier-naming.ProtectedMemberSuffix
+    value: "_"
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: cppcoreguidelines-non-private-member-variables-in-classes
+    value: true
+  - key: modernize-loop-convert.MaxCopySize
+    value: 16
+  - key: modernize-loop-convert.MinConfidence
+    value: reasonable
+  - key: performance-move-const-arg.CheckTriviallyCopyableMove
+    value: false
+  - key: readability-implicit-bool-conversion.AllowIntegerConditions
+    value: false
+
+HeaderFilterRegex: ".*/(include|src)/.*\\.h(pp)?$"
+AnalyzeTemporaryDtors: true
+FormatStyle: file
+User: "AUTOSAR-Builder"
