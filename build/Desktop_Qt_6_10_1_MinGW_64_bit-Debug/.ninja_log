@@ -1,0 +1,22 @@
+# ninja log v6
+66	1149	7892884486663394	shfihew_autogen/timestamp	377fc3f930314f09
+66	1149	7892884486663394	shfihew_autogen/mocs_compilation.cpp	377fc3f930314f09
+66	1149	7892884486663394	C:/Users/Asus/OneDrive/Documents/shfihew/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/shfihew_autogen/timestamp	377fc3f930314f09
+1154	6535	7892884487645540	CMakeFiles/shfihew.dir/shfihew_autogen/mocs_compilation.cpp.obj	8b4135c711ec517a
+66	1149	7892884486663394	C:/Users/Asus/OneDrive/Documents/shfihew/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/shfihew_autogen/mocs_compilation.cpp	377fc3f930314f09
+1160	6336	7892884487695625	CMakeFiles/shfihew.dir/main.cpp.obj	c1d491e909e7467e
+1164	7067	7892884487741853	CMakeFiles/shfihew.dir/mainwindow.cpp.obj	e14824fed9d06e73
+7067	8094	7892884546766112	shfihew.exe	7bdb86dd3716b39e
+1183	2649	7892884487926860	CMakeFiles/shfihew.dir/MusicPlayerProject/src/PlaybackHistory.cpp.obj	9512d6733eae04a1
+1178	2665	7892884487882992	CMakeFiles/shfihew.dir/MusicPlayerProject/src/PlaybackQueue.cpp.obj	cdc79cb3a14b6473
+1173	2683	7892884487830208	CMakeFiles/shfihew.dir/MusicPlayerProject/src/MusicPlayer.cpp.obj	d4c50ed08230236e
+1187	2725	7892884487976853	CMakeFiles/shfihew.dir/MusicPlayerProject/src/SmartPlaylist.cpp.obj	53155e7d18c09d7e
+1168	2902	7892884487774564	CMakeFiles/shfihew.dir/MusicPlayerProject/src/MusicLibrary.cpp.obj	e276d2315e13a082
+82	1185	7897162124414881	shfihew_autogen/timestamp	377fc3f930314f09
+82	1185	7897162124414881	shfihew_autogen/mocs_compilation.cpp	377fc3f930314f09
+82	1185	7897162124414881	C:/Users/Asus/OneDrive/Documents/shfihew/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/shfihew_autogen/timestamp	377fc3f930314f09
+82	1185	7897162124414881	C:/Users/Asus/OneDrive/Documents/shfihew/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/shfihew_autogen/mocs_compilation.cpp	377fc3f930314f09
+1197	6110	7897162125717054	CMakeFiles/shfihew.dir/main.cpp.obj	c1d491e909e7467e
+1191	6134	7897162125667052	CMakeFiles/shfihew.dir/shfihew_autogen/mocs_compilation.cpp.obj	8b4135c711ec517a
+1200	6495	7897162125757062	CMakeFiles/shfihew.dir/mainwindow.cpp.obj	e14824fed9d06e73
+6495	7526	7897162178706445	shfihew.exe	7bdb86dd3716b39e
