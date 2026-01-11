@@ -30,15 +30,6 @@ MusicController::MusicController(QObject *parent)
         }
     });
     
-    // Load demo playlist
-    loadDemoPlaylist();
-    
-    // Khởi tạo bài đầu tiên (không thêm vào queue)
-    if (!playlist.isEmpty()) {
-        currentPlayingSong = playlist[0];
-        currentTrackIndex = 0;
-    }
-    
     // Set initial volume
     audioOutput->setVolume(currentVolume / 100.0f);
 }
@@ -625,18 +616,20 @@ void MusicController::playTrack(int index)
 
 
 // Clears existing data, registers 10 demo tracks, and triggers a UI refresh signal.
-void MusicController::loadDemoPlaylist()
+void MusicController::loadMusicFolder(const QString &folderPath)
 {
     playlist.clear();
-    // musicLibrary.clear(); // Bỏ comment nếu bạn đã thêm hàm clear() vào MusicLibrary
 
-    std::string musicFolderPath = "C:/Users/Asus/Downloads/Playlist"; 
+    std::string musicFolderPathStr = folderPath.toStdString();
 
     try {
-        if (!fs::exists(musicFolderPath)) return;
+        if (!fs::exists(musicFolderPathStr)) {
+            qDebug() << "Folder does not exist:" << folderPath;
+            return;
+        }
 
         int idCounter = 1;
-        for (const auto& entry : fs::directory_iterator(musicFolderPath)) {
+        for (const auto& entry : fs::directory_iterator(musicFolderPathStr)) {
             if (entry.is_regular_file()) {
                 const auto& path = entry.path();
                 std::string ext = path.extension().string();
@@ -671,8 +664,14 @@ void MusicController::loadDemoPlaylist()
                 }
             }
         }
+        
+        // Khởi tạo bài đầu tiên nếu có nhạc
+        if (!playlist.isEmpty()) {
+            currentPlayingSong = playlist[0];
+            currentTrackIndex = 0;
+        }
     } catch (const std::exception& e) {
-        qDebug() << "Lỗi quét thư mục:" << e.what();
+        qDebug() << "Error scanning folder:" << e.what();
     }
 
     emit playlistChanged();

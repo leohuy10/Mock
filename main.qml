@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 ApplicationWindow {
     id: root
@@ -434,20 +435,39 @@ ApplicationWindow {
                 }
             }
 
-            // Bottom Button
+            // Browse Music Folder Button
             Button {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 50
-                text: "ADD MUSIC FILES"
-                onClicked: console.log("Open File Dialog")
+                text: "BROWSE MUSIC FOLDER"
+                onClicked: folderDialog.open()
                 background: Rectangle {
                     color: "transparent"
                     border.color: colorAccent
                     border.width: 2
                     radius: 12
                 }
-                contentItem: Text { text: parent.text; color: colorText; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                contentItem: Text { 
+                    text: parent.text
+                    color: colorText
+                    font.bold: true
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
+        }
+    }
+
+    // Folder Dialog for selecting music folder
+    FolderDialog {
+        id: folderDialog
+        onAccepted: {
+            var folderPath = selectedFolder.toString()
+            // Remove file:// prefix for Windows paths
+            if (folderPath.startsWith("file:///")) {
+                folderPath = folderPath.substring(8)
+            }
+            musicController.loadMusicFolder(folderPath)
         }
     }
 }

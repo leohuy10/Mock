@@ -82,6 +82,7 @@ public slots:
     void addMusicFiles(const QStringList &filePaths);
     void selectTrack(int index);
     void clearPlaylist();
+    void loadMusicFolder(const QString &folderPath);
     
     // Utility
     QString formatTime(qint64 milliseconds) const;
@@ -112,7 +113,6 @@ private:
     void updateTrackInfo();
     void playTrack(int index);
     void playSongFile(const QString &filePath);  // Helper phát nhạc
-    void loadDemoPlaylist();
 
     QMediaPlayer *player;
     QAudioOutput *audioOutput;
