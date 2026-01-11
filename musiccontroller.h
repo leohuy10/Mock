@@ -30,6 +30,7 @@ class MusicController : public QObject
     Q_PROPERTY(bool isRepeat READ getIsRepeat WRITE setRepeat NOTIFY repeatStateChanged)
     Q_PROPERTY(QStringList playlistItems READ getPlaylistItems NOTIFY playlistChanged)
     Q_PROPERTY(int currentTrackIndex READ getCurrentTrackIndex WRITE setCurrentTrackIndex NOTIFY currentTrackIndexChanged)
+    Q_PROPERTY(int currentMode READ getCurrentMode NOTIFY currentModeChanged)
 
     enum FilterMode {
         ShowAll,
@@ -64,6 +65,8 @@ public slots:
     void setFilterMode(int mode);
     void addToQueue(int songId);
     int getSongIdAt(int index) const;
+    void removeFromQueue(int index);
+    int getCurrentMode() const { return static_cast<int>(currentMode); }
 
     // Playback control
     void playPause();
@@ -92,12 +95,14 @@ signals:
     void repeatStateChanged();
     void playlistChanged();
     void currentTrackIndexChanged();
+    void currentModeChanged();
 
 private slots:
     void onPositionChanged(qint64 position);
     void onDurationChanged(qint64 duration);
     void onMediaPlayerStateChanged(QMediaPlayer::PlaybackState state);
     void onPlaybackEnded();
+    bool isSongInQueue(int songId) const;
 
 private:
     void updateTrackInfo();

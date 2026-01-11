@@ -9,6 +9,7 @@ PlaybackQueue::PlaybackQueue()
 
 void PlaybackQueue::addSong(const Song &song)
 {
+    // [Fix] Kiem tra xem bai hat day trong Queue da ton tai hay chua
     queue.push_back(song);
     // Nếu danh sách có 1 bài, điều chỉnh con trỏ về phần tử đầu tiên
     if (queue.size() == 1)

@@ -2,6 +2,8 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QRandomGenerator>
+#include <filesystem> // Thêm thư viện này ở đầu file
+namespace fs = std::filesystem;
 
 MusicController::MusicController(QObject *parent)
     : QObject(parent)
@@ -379,116 +381,52 @@ void MusicController::playTrack(int index)
 void MusicController::loadDemoPlaylist()
 {
     playlist.clear();
-    
-    // Bài 1
-    ExtendedSong song1;
-    song1.id = 1;
-    song1.title = "Summer Nights";
-    song1.artist = "The Waves";
-    song1.album = "Sunset Drive";
-    song1.duration = 210;
-    song1.filePath = "";
-    playlist.append(song1);
-    musicLibrary.addSong(song1);
-    
-    // Bài 2
-    ExtendedSong song2;
-    song2.id = 2;
-    song2.title = "Highway Dreams";
-    song2.artist = "Road Kings";
-    song2.album = "Journey";
-    song2.duration = 195;
-    song2.filePath = "";
-    playlist.append(song2);
-    musicLibrary.addSong(song2);
-   
-    // Bài 3
-    ExtendedSong song3;
-    song3.id = 3;
-    song3.title = "Neon Lights";
-    song3.artist = "Synth City";
-    song3.album = "Cyberpunk 2077";
-    song3.duration = 245;
-    song3.filePath = "";
-    playlist.append(song3);
-    musicLibrary.addSong(song3);
+    // musicLibrary.clear(); // Bỏ comment nếu bạn đã thêm hàm clear() vào MusicLibrary
 
-    // Bài 4
-    ExtendedSong song4;
-    song4.id = 4;
-    song4.title = "Midnight City";
-    song4.artist = "M83";
-    song4.album = "Hurry Up";
-    song4.duration = 243;
-    song4.filePath = "";
-    playlist.append(song4);
-    musicLibrary.addSong(song4);
+    std::string musicFolderPath = "/home/quang/Music"; 
 
-    // Bài 5
-    ExtendedSong song5;
-    song5.id = 5;
-    song5.title = "Blinding Lights";
-    song5.artist = "The Weeknd";
-    song5.album = "After Hours";
-    song5.duration = 200;
-    song5.filePath = "";
-    playlist.append(song5);
-    musicLibrary.addSong(song5);
+    try {
+        if (!fs::exists(musicFolderPath)) return;
 
-    // Bài 6
-    ExtendedSong song6;
-    song6.id = 6;
-    song6.title = "Levitating";
-    song6.artist = "Dua Lipa";
-    song6.album = "Future Nostalgia";
-    song6.duration = 203;
-    song6.filePath = "";
-    playlist.append(song6);
-    musicLibrary.addSong(song6);
+        int idCounter = 1;
+        for (const auto& entry : fs::directory_iterator(musicFolderPath)) {
+            if (entry.is_regular_file()) {
+                const auto& path = entry.path();
+                std::string ext = path.extension().string();
+                std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
-    // Bài 7
-    ExtendedSong song7;
-    song7.id = 7;
-    song7.title = "Shape of You";
-    song7.artist = "Ed Sheeran";
-    song7.album = "Divide";
-    song7.duration = 233;
-    song7.filePath = "";
-    playlist.append(song7);
-    musicLibrary.addSong(song7);
+                if (ext == ".mp3" || ext == ".wav" || ext == ".m4a" || ext == ".flac") {
+                    
+                    // 1. Lấy tên file không bao gồm đuôi (ví dụ: "Nang Thuy Tinh - Khanh Ly")
+                    QString fullFileName = QString::fromStdString(path.stem().string());
+                    
+                    // 2. Tách chuỗi dựa trên dấu gạch ngang "-"
+                    QStringList parts = fullFileName.split("-");
+                    
+                    ExtendedSong song;
+                    song.id = idCounter++;
+                    song.filePath = path.string();
+                    song.duration = 180; // Mặc định 3 phút
+                    song.album = "Local Folder"; 
 
-    // Bài 8
-    ExtendedSong song8;
-    song8.id = 8;
-    song8.title = "Heat Waves";
-    song8.artist = "Glass Animals";
-    song8.album = "Dreamland";
-    song8.duration = 238;
-    song8.filePath = "";
-    playlist.append(song8);
-    musicLibrary.addSong(song8);
+                    if (parts.size() >= 2) {
+                        // Nếu file có dạng "Ten Bai Hat - Ten Tac Gia"
+                        song.title = parts.at(0).trimmed().toStdString();
+                        song.artist = parts.at(1).trimmed().toStdString();
+                    } else {
+                        // Nếu file chỉ có tên (không có dấu -)
+                        song.title = fullFileName.trimmed().toStdString();
+                        song.artist = "Unknown Artist";
+                    }
 
-    // Bài 9
-    ExtendedSong song9;
-    song9.id = 9;
-    song9.title = "Cold Heart";
-    song9.artist = "Elton John";
-    song9.album = "The Lockdown";
-    song9.duration = 202;
-    song9.filePath = "";
-    playlist.append(song9);
-    musicLibrary.addSong(song9);
-
-    // Bài 10
-    ExtendedSong song10;
-    song10.id = 10;
-    song10.title = "Save Your Tears";
-    song10.artist = "The Weeknd";
-    song10.album = "After Hours";
-    song10.duration = 215;
-    song10.filePath = "";
-    playlist.append(song10);
-    musicLibrary.addSong(song10);
+                    playlist.append(song);
+                    musicLibrary.addSong(song);
+                }
+            }
+        }
+    } catch (const std::exception& e) {
+        qDebug() << "Lỗi quét thư mục:" << e.what();
+    }
 
     emit playlistChanged();
 }
@@ -502,25 +440,19 @@ QString MusicController::formatTime(qint64 milliseconds) const
 }
 
 void MusicController::search(const QString &text) {
-    // Luôn xóa danh sách hiển thị trước khi lọc mới
+    // Luôn xóa danh sách hiển thị trước khi làm mới
     playlist.clear();
     QString lowerQuery = text.toLower();
 
     if (currentMode == ShowQueue) {
         // --- CHẾ ĐỘ HÀNG CHỜ ---
-        // Chỉ duyệt trong danh sách manualQueue (những bài đã nhấn "Thêm vào hàng chờ")
+        // FIX: Không lọc theo 'text'. Luôn hiện đầy đủ những gì có trong manualQueue.
         for (const auto &song : manualQueue) {
-            QString title = QString::fromStdString(song.title).toLower();
-            QString artist = QString::fromStdString(song.artist).toLower();
-
-            // Nếu ô tìm kiếm trống -> Hiện hết Queue. Nếu có chữ -> Lọc trong Queue.
-            if (text.isEmpty() || title.contains(lowerQuery) || artist.contains(lowerQuery)) {
-                playlist.append(song);
-            }
+            playlist.append(song);
         }
     } else {
         // --- CHẾ ĐỘ TẤT CẢ (LIBRARY) ---
-        // Duyệt toàn bộ MusicLibrary (Kho 10 bài gốc hoặc 50.000 bài)
+        // Chỉ tìm kiếm (lọc) khi đang ở chế độ này
         for (size_t i = 0; i < musicLibrary.size(); ++i) {
             const Song* s = musicLibrary.getSongByIndex(i);
             if (!s) continue;
@@ -528,6 +460,7 @@ void MusicController::search(const QString &text) {
             QString title = QString::fromStdString(s->title).toLower();
             QString artist = QString::fromStdString(s->artist).toLower();
 
+            // Thực hiện lọc theo text
             if (text.isEmpty() || title.contains(lowerQuery) || artist.contains(lowerQuery)) {
                 ExtendedSong exSong;
                 exSong.id = s->id;
@@ -541,17 +474,25 @@ void MusicController::search(const QString &text) {
         }
     }
 
-    emit playlistChanged(); // Cập nhật giao diện ListView
+    emit playlistChanged(); // Cập nhật ListView trong QML
 }
 
 void MusicController::setFilterMode(int mode) {
     currentMode = static_cast<FilterMode>(mode);
-    // Khi chuyển tab, ta reset lại hiển thị bằng cách gọi search với chuỗi rỗng
+    emit currentModeChanged(); // QUAN TRỌNG
     search(""); 
 }
 
 void MusicController::addToQueue(int songId) {
-    // 1. Tìm bài hát trong Library bằng ID
+    // 1. Kiểm tra xem bài hát đã tồn tại trong manualQueue chưa
+    for (const auto &song : manualQueue) {
+        if (song.id == songId) {
+            qDebug() << "Bài hát ID:" << songId << " đã tồn tại trong hàng chờ.";
+            return; // Thoát hàm, không thêm nữa
+        }
+    }
+
+    // 2. Tìm bài hát trong Library bằng ID
     Song* s = musicLibrary.findSongByID(songId);
     
     if (s) {
@@ -561,19 +502,22 @@ void MusicController::addToQueue(int songId) {
         ex.artist = s->artist;
         ex.album = s->album;
         ex.duration = s->duration;
-        // ex.filePath = s->filePath;
+        // ex.filePath = s->filePath; // Đảm bảo filePath được copy nếu có dữ liệu
 
-        // 2. Thêm vào danh sách chờ thủ công
+        // 3. Thêm vào danh sách chờ thủ công
         manualQueue.append(ex);
 
-        // 3. QUAN TRỌNG: Nếu đang đứng ở tab "Hàng chờ", phải gọi search để cập nhật UI ngay
+        // 4. Đồng bộ với class PlaybackQueue (nếu bạn đang dùng nó để quản lý logic lõi)
+        playbackQueue.addSong(ex);
+
+        // 5. Cập nhật giao diện nếu đang ở tab "Hàng chờ"
         if (currentMode == ShowQueue) {
             search(""); 
         }
         
-        qDebug() << "Đã thêm vào hàng chờ ID:" << songId << "Tổng cộng:" << manualQueue.size();
+        qDebug() << "Đã thêm mới vào hàng chờ ID:" << songId << "| Tổng cộng:" << manualQueue.size();
     } else {
-        qDebug() << "Không tìm thấy bài hát với ID:" << songId;
+        qDebug() << "Không tìm thấy bài hát trong Library với ID:" << songId;
     }
 }
 
@@ -582,4 +526,26 @@ int MusicController::getSongIdAt(int index) const {
         return playlist[index].id;
     }
     return -1; // Không tìm thấy
+}
+
+void MusicController::removeFromQueue(int index) {
+    // Chỉ xử lý nếu đang ở chế độ ShowQueue
+    if (currentMode == ShowQueue) {
+        if (index >= 0 && index < manualQueue.size()) {
+            manualQueue.removeAt(index); // Xóa khỏi danh sách chờ thực tế
+            
+            // Cập nhật lại danh sách hiển thị (playlist)
+            search(""); 
+            
+            qDebug() << "Removed song at index:" << index << " Remaining in queue:" << manualQueue.size();
+        }
+    }
+}
+
+// Trong MusicController.cpp
+bool MusicController::isSongInQueue(int songId) const {
+    for (const auto &song : manualQueue) {
+        if (song.id == songId) return true;
+    }
+    return false;
 }

@@ -237,14 +237,14 @@ ApplicationWindow {
                 spacing: 10
 
                 Button {
-                    text: "Tất cả"
+                    text: "My songs"
                     highlighted: musicController.filterMode === 0 // Giả sử bạn tạo property
                     onClicked: musicController.setFilterMode(0)
                     Layout.fillWidth: true
                 }
 
                 Button {
-                    text: "Hàng chờ (Queue)"
+                    text: "My playlist"
                     highlighted: musicController.filterMode === 1
                     onClicked: musicController.setFilterMode(1)
                     Layout.fillWidth: true
@@ -302,12 +302,19 @@ ApplicationWindow {
                                     y: parent.height
 
                                     MenuItem {
-                                        text: "Thêm vào hàng chờ"
+                                        // Tự động đổi chữ hiển thị: 0 là ShowAll, 1 là ShowQueue
+                                        text: musicController.currentMode === 0 ? "Thêm vào hàng chờ" : "Xóa khỏi hàng chờ"
+                                        // enabled: !musicController.isSongInQueue(model.id);
                                         onTriggered: {
-                                            // Lấy ID thật từ C++ dựa trên vị trí đang bấm
-                                            var realId = musicController.getSongIdAt(index)
-                                            if (realId !== -1) {
-                                                musicController.addToQueue(realId)
+                                            if (musicController.currentMode === 0) {
+                                                // Đang ở tab "Tất cả": Lấy ID và thêm vào Queue
+                                                var realId = musicController.getSongIdAt(index)
+                                                if (realId !== -1) {
+                                                    musicController.addToQueue(realId)
+                                                }
+                                            } else {
+                                                // Đang ở tab "Hàng chờ": Xóa khỏi Queue theo index
+                                                musicController.removeFromQueue(index)
                                             }
                                         }
                                     }
