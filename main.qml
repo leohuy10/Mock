@@ -380,12 +380,42 @@ ApplicationWindow {
                 clip: true
                 border.color: colorBg3
 
+                // Empty state message
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    visible: musicController.playlistItems.length === 0
+                    spacing: 20
+                    
+                    Text {
+                        text: "🎵"
+                        font.pixelSize: 48
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    
+                    Text {
+                        text: "No Songs Loaded"
+                        color: colorText
+                        font.pixelSize: 20
+                        font.bold: true
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    
+                    Text {
+                        text: "Click 'BROWSE MUSIC FOLDER' below\nto load your music files"
+                        color: colorDim
+                        font.pixelSize: 14
+                        Layout.alignment: Qt.AlignHCenter
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+
                 ListView {
                     id: playlistView
                     anchors.fill: parent
                     anchors.margins: 10
                     model: musicController.playlistItems
                     spacing: 5
+                    visible: musicController.playlistItems.length > 0
 
                     currentIndex: musicController.currentTrackIndex
 
