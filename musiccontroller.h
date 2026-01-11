@@ -107,6 +107,7 @@ private slots:
 private:
     void updateTrackInfo();
     void playTrack(int index);
+    void playSongFile(const QString &filePath);  // Helper phát nhạc
     void loadDemoPlaylist();
 
     QMediaPlayer *player;
@@ -125,10 +126,13 @@ private:
     bool isRepeat;
     int currentVolume;
 
-    // FIlter
+    // Filter
     FilterMode currentMode = ShowAll;
     QVector<ExtendedSong> queueList;
     QVector<ExtendedSong> manualQueue; // ds hang cho thu cong
+    
+    // Bài đang phát (lưu riêng để đồng bộ giữa các mode)
+    ExtendedSong currentPlayingSong;
 };
 
 #endif // MUSICCONTROLLER_H

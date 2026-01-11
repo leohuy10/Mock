@@ -374,11 +374,18 @@ ApplicationWindow {
                             Text { text: (index + 1); color: colorPrimary; opacity: 0.5; Layout.preferredWidth: 25; }
                             Text { text: modelData; color: colorText; Layout.fillWidth: true; elide: Text.ElideRight;}
                             Text { 
-                                text: "..."; visible: playlistView.currentIndex === index; color: colorPrimary; font.pixelSize: 32;
+                                text: "⋯"
+                                color: colorDim
+                                font.pixelSize: 24
+                                opacity: 0.6
 
                                 MouseArea {
                                     anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
                                     onClicked: contextMenu.open()
+                                    hoverEnabled: true
+                                    onEntered: parent.opacity = 1
+                                    onExited: parent.opacity = 0.6
                                 }
 
                                 Menu {
