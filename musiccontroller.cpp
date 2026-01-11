@@ -217,31 +217,29 @@ void MusicController::next()
         ExtendedSong nextSong = manualQueue.takeFirst();
         qDebug() << "Playing from Queue:" << QString::fromStdString(nextSong.title);
         
-        // Tìm bài trong playlist hiện tại
+        // Phát trực tiếp từ queue (không cần tìm trong playlist)
+        currentPlayingSong = nextSong;
+        
+        player->stop();
+        player->setSource(QUrl::fromLocalFile(QString::fromStdString(nextSong.filePath)));
+        player->play();
+        isPlaying = true;
+        
+        // Cập nhật currentTrackIndex nếu bài này có trong playlist hiện tại
         for (int i = 0; i < playlist.size(); ++i) {
             if (playlist[i].id == nextSong.id) {
                 currentTrackIndex = i;
-                currentPlayingSong = playlist[i];
-                
-                // PHÁT NHẠC
-                player->stop();
-                player->setSource(QUrl::fromLocalFile(QString::fromStdString(currentPlayingSong.filePath)));
-                player->play();
-                isPlaying = true;
-                
-                updateTrackInfo();
-                emit currentTrackIndexChanged();
-                emit playingStateChanged();
-                
-                qDebug() << "Now playing index:" << i;
-                
-                if (currentMode == ShowQueue) {
-                    search("");
-                }
-                return;
+                break;
             }
         }
-        qDebug() << "Song not found in playlist!";
+        
+        updateTrackInfo();
+        emit currentTrackIndexChanged();
+        emit playingStateChanged();
+        
+        if (currentMode == ShowQueue) {
+            search("");
+        }
         return;
     }
     
@@ -423,26 +421,28 @@ void MusicController::onPlaybackEnded()
         ExtendedSong nextSong = manualQueue.takeFirst();
         qDebug() << "Auto playing from Queue:" << QString::fromStdString(nextSong.title);
         
-        // Tìm bài trong playlist
+        // Phát trực tiếp từ queue
+        currentPlayingSong = nextSong;
+        
+        player->stop();
+        player->setSource(QUrl::fromLocalFile(QString::fromStdString(nextSong.filePath)));
+        player->play();
+        isPlaying = true;
+        
+        // Cập nhật currentTrackIndex nếu có trong playlist
         for (int i = 0; i < playlist.size(); ++i) {
             if (playlist[i].id == nextSong.id) {
                 currentTrackIndex = i;
-                currentPlayingSong = playlist[i];
-                
-                player->stop();
-                player->setSource(QUrl::fromLocalFile(QString::fromStdString(currentPlayingSong.filePath)));
-                player->play();
-                isPlaying = true;
-                
-                updateTrackInfo();
-                emit currentTrackIndexChanged();
-                emit playingStateChanged();
-                
-                if (currentMode == ShowQueue) {
-                    search("");
-                }
-                return;
+                break;
             }
+        }
+        
+        updateTrackInfo();
+        emit currentTrackIndexChanged();
+        emit playingStateChanged();
+        
+        if (currentMode == ShowQueue) {
+            search("");
         }
         return;
     }

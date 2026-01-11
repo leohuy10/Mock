@@ -13,7 +13,7 @@
 
 // Extended Song struct to include file path
 struct ExtendedSong : public Song {
-    std::string filePath;
+    // Kế thừa tất cả từ Song (id, title, artist, album, duration, filePath)
 };
 
 class MusicController : public QObject
