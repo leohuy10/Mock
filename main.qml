@@ -93,7 +93,7 @@ ApplicationWindow {
                     from: 0
                     to: musicController.totalDuration > 0 ? musicController.totalDuration : 100
                     value: 0
-                    live: false
+                    live: true
                     
                     Connections {
                         target: musicController
@@ -123,8 +123,30 @@ ApplicationWindow {
                     handle: Rectangle {
                         x: progressSlider.leftPadding + progressSlider.visualPosition * (progressSlider.availableWidth - width)
                         y: progressSlider.topPadding + progressSlider.availableHeight / 2 - height / 2
-                        width: 18; height: 18; radius: 9
+                        width: 18
+                        height: 18
+                        radius: 9
                         color: colorPrimary
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -5
+                            cursorShape: Qt.PointingHandCursor
+                            drag.target: parent
+                            drag.axis: Drag.XAxis
+                            drag.minimumX: progressSlider.leftPadding
+                            drag.maximumX: progressSlider.availableWidth + progressSlider.leftPadding - parent.width
+                            
+                            onPressed: {
+                                progressSlider.pressed = true
+                            }
+                            
+                            onReleased: {
+                                var position = ((parent.x - progressSlider.leftPadding) / (progressSlider.availableWidth - parent.width)) * progressSlider.to
+                                musicController.seek(position)
+                                progressSlider.pressed = false
+                            }
+                        }
                     }
                 }
 
