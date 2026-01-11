@@ -413,7 +413,7 @@ ApplicationWindow {
                             }
                         }
                         onClicked: {
-                            playlistView.currentIndex = index
+                            // Chỉ gọi backend, binding sẽ tự cập nhật currentIndex
                             musicController.selectTrack(index)
                         }
                     }
