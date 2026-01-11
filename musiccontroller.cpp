@@ -121,6 +121,11 @@ int MusicController::getCurrentTrackIndex() const
     return currentTrackIndex;
 }
 
+int MusicController::getQueueCount() const
+{
+    return manualQueue.size();
+}
+
 // ===== SETTER PROPERTIES =====
 
 void MusicController::setVolume(int value)
@@ -212,9 +217,26 @@ void MusicController::next()
 {
     qDebug() << ">>> NEXT button pressed";
     
+    // Thêm bài hát hiện tại vào history
+    if (!currentPlayingSong.title.empty()) {
+        playbackHistory.pushSong(currentPlayingSong);
+    }
+    
+    // ===== ƯU TIÊN 0: REPEAT (Phát lại) =====
+    if (isRepeat) {
+        qDebug() << "Repeat mode: replaying current song";
+        player->stop();
+        player->setSource(QUrl::fromLocalFile(QString::fromStdString(currentPlayingSong.filePath)));
+        player->play();
+        isPlaying = true;
+        emit playingStateChanged();
+        return;
+    }
+    
     // ===== ƯU TIÊN 1: HÀNG CHỜ (Queue) =====
     if (!manualQueue.isEmpty()) {
         ExtendedSong nextSong = manualQueue.takeFirst();
+        emit queueCountChanged();  // Cập nhật số lượng queue
         qDebug() << "Playing from Queue:" << QString::fromStdString(nextSong.title);
         
         // Phát trực tiếp từ queue (không cần tìm trong playlist)
@@ -286,34 +308,48 @@ void MusicController::previous()
 {
     qDebug() << ">>> PREVIOUS button pressed";
     
-    if (playlist.isEmpty()) {
-        qDebug() << "Playlist is empty!";
+    // Kiểm tra xem có bài trong history không
+    if (playbackHistory.isEmpty()) {
+        qDebug() << "No previous songs in history!";
         return;
     }
     
-    // Tính index mới
-    int newIndex = currentTrackIndex - 1;
-    if (newIndex < 0) {
-        newIndex = playlist.size() - 1;
+    try {
+        // Lấy bài hát từ history (LIFO - bài vừa phát gần đây nhất)
+        Song prevSong = playbackHistory.playPreviousSong();
+        
+        qDebug() << "Playing from History:" << QString::fromStdString(prevSong.title);
+        
+        // Cập nhật bài hát hiện tại
+        currentPlayingSong.id = prevSong.id;
+        currentPlayingSong.title = prevSong.title;
+        currentPlayingSong.artist = prevSong.artist;
+        currentPlayingSong.album = prevSong.album;
+        currentPlayingSong.duration = prevSong.duration;
+        currentPlayingSong.filePath = prevSong.filePath;
+        
+        // Tìm index trong playlist để cập nhật currentTrackIndex
+        for (int i = 0; i < playlist.size(); ++i) {
+            if (playlist[i].id == prevSong.id) {
+                currentTrackIndex = i;
+                break;
+            }
+        }
+        
+        // PHÁT NHẠC
+        player->stop();
+        player->setSource(QUrl::fromLocalFile(QString::fromStdString(currentPlayingSong.filePath)));
+        player->play();
+        isPlaying = true;
+        
+        updateTrackInfo();
+        emit currentTrackIndexChanged();
+        emit playingStateChanged();
+        
+        qDebug() << "Now playing:" << QString::fromStdString(currentPlayingSong.title);
+    } catch (const std::exception &e) {
+        qDebug() << "Error in previous():" << e.what();
     }
-    
-    qDebug() << "Playing from Playlist, index:" << currentTrackIndex << "->" << newIndex;
-    
-    // Cập nhật và phát
-    currentTrackIndex = newIndex;
-    currentPlayingSong = playlist[currentTrackIndex];
-    
-    // PHÁT NHẠC
-    player->stop();
-    player->setSource(QUrl::fromLocalFile(QString::fromStdString(currentPlayingSong.filePath)));
-    player->play();
-    isPlaying = true;
-    
-    updateTrackInfo();
-    emit currentTrackIndexChanged();
-    emit playingStateChanged();
-    
-    qDebug() << "Now playing:" << QString::fromStdString(currentPlayingSong.title);
 }
 
 void MusicController::seek(qint64 position)
@@ -353,10 +389,16 @@ void MusicController::selectTrack(int index)
         return;
     }
     
+    // Thêm bài hát hiện tại vào history trước khi chuyển
+    if (!currentPlayingSong.title.empty()) {
+        playbackHistory.pushSong(currentPlayingSong);
+    }
+    
     // Xóa bài này khỏi queue nếu đã có (tránh duplicate)
     for (int i = 0; i < manualQueue.size(); ++i) {
         if (manualQueue[i].id == playlist[index].id) {
             manualQueue.removeAt(i);
+            emit queueCountChanged();
             break;
         }
     }
@@ -419,6 +461,7 @@ void MusicController::onPlaybackEnded()
     // ===== ƯU TIÊN 1: HÀNG CHỜ (Queue) =====
     if (!manualQueue.isEmpty()) {
         ExtendedSong nextSong = manualQueue.takeFirst();
+        emit queueCountChanged();  // Cập nhật số lượng queue
         qDebug() << "Auto playing from Queue:" << QString::fromStdString(nextSong.title);
         
         // Phát trực tiếp từ queue
@@ -558,6 +601,11 @@ void MusicController::playSongFile(const QString &filePath)
 void MusicController::playTrack(int index)
 {
     if (index < 0 || index >= playlist.size()) return;
+    
+    // Thêm bài hát hiện tại vào history trước khi chuyển sang bài mới
+    if (!currentPlayingSong.title.empty()) {
+        playbackHistory.pushSong(currentPlayingSong);
+    }
     
     currentTrackIndex = index;
     currentPlayingSong = playlist[index];
@@ -714,6 +762,7 @@ void MusicController::addToQueue(int songId) {
 
         // 3. Thêm vào danh sách chờ thủ công
         manualQueue.append(ex);
+        emit queueCountChanged();  // Cập nhật số lượng queue
 
         // 4. Đồng bộ với class PlaybackQueue (nếu bạn đang dùng nó để quản lý logic lõi)
         playbackQueue.addSong(ex);
@@ -741,6 +790,7 @@ void MusicController::removeFromQueue(int index) {
     if (currentMode == ShowQueue) {
         if (index >= 0 && index < manualQueue.size()) {
             manualQueue.removeAt(index); // Xóa khỏi danh sách chờ thực tế
+            emit queueCountChanged();  // Cập nhật số lượng queue
             
             // Cập nhật lại danh sách hiển thị (playlist)
             search(""); 

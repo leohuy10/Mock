@@ -91,8 +91,21 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     from: 0
                     to: musicController.totalDuration > 0 ? musicController.totalDuration : 100
-                    value: musicController.currentPosition
-                    onMoved: musicController.seek(value)
+                    value: 0
+                    live: false
+                    
+                    Connections {
+                        target: musicController
+                        function onPositionChanged() {
+                            if (!progressSlider.pressed) {
+                                progressSlider.value = musicController.currentPosition
+                            }
+                        }
+                    }
+                    
+                    onMoved: {
+                        musicController.seek(value)
+                    }
                     
                     background: Rectangle {
                         height: 8
@@ -316,7 +329,7 @@ ApplicationWindow {
                         
                         // Badge hiển thị số lượng trong queue
                         Rectangle {
-                            visible: musicController.currentMode === 1 || true
+                            visible: musicController.queueCount > 0
                             Layout.alignment: Qt.AlignVCenter
                             width: 24
                             height: 20
@@ -325,7 +338,7 @@ ApplicationWindow {
                             
                             Text {
                                 anchors.centerIn: parent
-                                text: "0"
+                                text: musicController.queueCount
                                 color: colorText
                                 font.pixelSize: 11
                                 font.bold: true

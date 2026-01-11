@@ -10,6 +10,7 @@
 #include "MusicLibrary.h"
 #include "MusicPlayer.h"
 #include "PlaybackQueue.h"
+#include "PlaybackHistory.h"
 
 // Extended Song struct to include file path
 struct ExtendedSong : public Song {
@@ -30,6 +31,7 @@ class MusicController : public QObject
     Q_PROPERTY(bool isRepeat READ getIsRepeat WRITE setRepeat NOTIFY repeatStateChanged)
     Q_PROPERTY(QStringList playlistItems READ getPlaylistItems NOTIFY playlistChanged)
     Q_PROPERTY(int currentTrackIndex READ getCurrentTrackIndex WRITE setCurrentTrackIndex NOTIFY currentTrackIndexChanged)
+    Q_PROPERTY(int queueCount READ getQueueCount NOTIFY queueCountChanged)
     Q_PROPERTY(int currentMode READ getCurrentMode NOTIFY currentModeChanged)
 
     enum FilterMode {
@@ -53,6 +55,7 @@ public:
     bool getIsRepeat() const;
     QStringList getPlaylistItems() const;
     int getCurrentTrackIndex() const;
+    int getQueueCount() const;
 
     // Setter properties
     void setVolume(int value);
@@ -96,6 +99,7 @@ signals:
     void playlistChanged();
     void currentTrackIndexChanged();
     void currentModeChanged();
+    void queueCountChanged();
 
 private slots:
     void onPositionChanged(qint64 position);
@@ -117,6 +121,7 @@ private:
     MusicLibrary musicLibrary;
     MusicPlayer musicPlayer;
     PlaybackQueue playbackQueue;
+    PlaybackHistory playbackHistory;
     
     // Playlist
     QVector<ExtendedSong> playlist;
