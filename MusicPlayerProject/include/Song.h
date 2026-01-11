@@ -11,6 +11,7 @@ struct Song
     std::string artist;
     std::string album;
     int duration;
+    std::string filePath;  // Đường dẫn file nhạc
 };
 
 #endif

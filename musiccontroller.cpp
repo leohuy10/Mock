@@ -383,7 +383,7 @@ void MusicController::loadDemoPlaylist()
     playlist.clear();
     // musicLibrary.clear(); // Bỏ comment nếu bạn đã thêm hàm clear() vào MusicLibrary
 
-    std::string musicFolderPath = "/home/quang/Music"; 
+    std::string musicFolderPath = "C:/Users/Asus/Downloads/Playlist"; 
 
     try {
         if (!fs::exists(musicFolderPath)) return;
@@ -468,7 +468,7 @@ void MusicController::search(const QString &text) {
                 exSong.artist = s->artist;
                 exSong.album = s->album;
                 exSong.duration = s->duration;
-                // exSong.filePath = s->filePath;
+                exSong.filePath = s->filePath;  // Copy đường dẫn file
                 playlist.append(exSong);
             }
         }
@@ -502,7 +502,7 @@ void MusicController::addToQueue(int songId) {
         ex.artist = s->artist;
         ex.album = s->album;
         ex.duration = s->duration;
-        // ex.filePath = s->filePath; // Đảm bảo filePath được copy nếu có dữ liệu
+        ex.filePath = s->filePath;  // Copy đường dẫn file
 
         // 3. Thêm vào danh sách chờ thủ công
         manualQueue.append(ex);

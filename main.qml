@@ -234,20 +234,104 @@ ApplicationWindow {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 10
+                spacing: 12
 
                 Button {
-                    text: "My songs"
-                    highlighted: musicController.filterMode === 0 // Giả sử bạn tạo property
-                    onClicked: musicController.setFilterMode(0)
+                    id: btnMySongs
                     Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    
+                    property bool isActive: musicController.currentMode === 0
+                    
+                    onClicked: musicController.setFilterMode(0)
+                    
+                    background: Rectangle {
+                        radius: 12
+                        color: btnMySongs.isActive ? colorPrimary : (btnMySongs.hovered ? colorBg3 : "transparent")
+                        border.color: btnMySongs.isActive ? colorPrimary : colorBg3
+                        border.width: 2
+                        
+                        Behavior on color { ColorAnimation { duration: 200 } }
+                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                    }
+                    
+                    contentItem: RowLayout {
+                        spacing: 8
+                        
+                        Text {
+                            text: "🎵"
+                            font.pixelSize: 16
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+                        
+                        Text {
+                            text: "My Songs"
+                            color: btnMySongs.isActive ? "#1a1a2e" : colorText
+                            font.pixelSize: 14
+                            font.bold: true
+                            font.letterSpacing: 0.5
+                            Layout.alignment: Qt.AlignVCenter
+                            
+                            Behavior on color { ColorAnimation { duration: 200 } }
+                        }
+                    }
                 }
 
                 Button {
-                    text: "My playlist"
-                    highlighted: musicController.filterMode === 1
-                    onClicked: musicController.setFilterMode(1)
+                    id: btnMyPlaylist
                     Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    
+                    property bool isActive: musicController.currentMode === 1
+                    
+                    onClicked: musicController.setFilterMode(1)
+                    
+                    background: Rectangle {
+                        radius: 12
+                        color: btnMyPlaylist.isActive ? colorAccent : (btnMyPlaylist.hovered ? colorBg3 : "transparent")
+                        border.color: btnMyPlaylist.isActive ? colorAccent : colorBg3
+                        border.width: 2
+                        
+                        Behavior on color { ColorAnimation { duration: 200 } }
+                        Behavior on border.color { ColorAnimation { duration: 200 } }
+                    }
+                    
+                    contentItem: RowLayout {
+                        spacing: 8
+                        
+                        Text {
+                            text: "🎶"
+                            font.pixelSize: 16
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+                        
+                        Text {
+                            text: "Queue"
+                            color: btnMyPlaylist.isActive ? colorText : colorText
+                            font.pixelSize: 14
+                            font.bold: true
+                            font.letterSpacing: 0.5
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+                        
+                        // Badge hiển thị số lượng trong queue
+                        Rectangle {
+                            visible: musicController.currentMode === 1 || true
+                            Layout.alignment: Qt.AlignVCenter
+                            width: 24
+                            height: 20
+                            radius: 10
+                            color: btnMyPlaylist.isActive ? "rgba(255,255,255,0.3)" : colorAccent
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "0"
+                                color: colorText
+                                font.pixelSize: 11
+                                font.bold: true
+                            }
+                        }
+                    }
                 }
             }
 
