@@ -98,7 +98,7 @@ QStringList MusicController::getPlaylistItems() const
 {
     QStringList items;
     for (const ExtendedSong &song : playlist) {
-        QString displayText = QString("%1 - %2 [%3]")
+        QString displayText = QString("%1")
             .arg(QString::fromStdString(song.title))
             .arg(QString::fromStdString(song.artist))
             .arg(formatTime(song.duration * 1000));
@@ -358,8 +358,6 @@ void MusicController::addMusicFiles(const QStringList &filePaths)
         ExtendedSong song;
         song.id = playlist.size() + 1;
         song.title = fileInfo.completeBaseName().toStdString();
-        song.artist = "Unknown Artist";
-        song.album = "Unknown Album";
         song.duration = 180;
         song.filePath = filePath.toStdString();
         
@@ -656,7 +654,6 @@ void MusicController::loadMusicFolder(const QString &folderPath)
                     } else {
                         // Nếu file chỉ có tên (không có dấu -)
                         song.title = fullFileName.trimmed().toStdString();
-                        song.artist = "Unknown Artist";
                     }
 
                     playlist.append(song);
@@ -739,41 +736,16 @@ void MusicController::setFilterMode(int mode) {
 }
 
 void MusicController::addToQueue(int songId) {
-    // 1. Kiểm tra xem bài hát đã tồn tại trong manualQueue chưa
-    for (const auto &song : manualQueue) {
-        if (song.id == songId) {
-            qDebug() << "Bài hát ID:" << songId << " đã tồn tại trong hàng chờ.";
-            return; // Thoát hàm, không thêm nữa
-        }
-    }
-
-    // 2. Tìm bài hát trong Library bằng ID
+    if (isSongInQueue(songId)) return;
     Song* s = musicLibrary.findSongByID(songId);
-    
-    if (s) {
-        ExtendedSong ex;
-        ex.id = s->id;
-        ex.title = s->title;
-        ex.artist = s->artist;
-        ex.album = s->album;
-        ex.duration = s->duration;
-        ex.filePath = s->filePath;  // Copy đường dẫn file
+    if(s) {
+        playbackQueue.addSong(*s);
 
-        // 3. Thêm vào danh sách chờ thủ công
+        ExtendedSong ex = *static_cast<ExtendedSong*>(s);
         manualQueue.append(ex);
+
         emit queueCountChanged();  // Cập nhật số lượng queue
-
-        // 4. Đồng bộ với class PlaybackQueue (nếu bạn đang dùng nó để quản lý logic lõi)
-        playbackQueue.addSong(ex);
-
-        // 5. Cập nhật giao diện nếu đang ở tab "Hàng chờ"
-        if (currentMode == ShowQueue) {
-            search(""); 
-        }
-        
-        qDebug() << "Đã thêm mới vào hàng chờ ID:" << songId << "| Tổng cộng:" << manualQueue.size();
-    } else {
-        qDebug() << "Không tìm thấy bài hát trong Library với ID:" << songId;
+        if (currentMode == ShowQueue) search("");
     }
 }
 
@@ -786,16 +758,14 @@ int MusicController::getSongIdAt(int index) const {
 
 void MusicController::removeFromQueue(int index) {
     // Chỉ xử lý nếu đang ở chế độ ShowQueue
-    if (currentMode == ShowQueue) {
-        if (index >= 0 && index < manualQueue.size()) {
-            manualQueue.removeAt(index); // Xóa khỏi danh sách chờ thực tế
-            emit queueCountChanged();  // Cập nhật số lượng queue
-            
-            // Cập nhật lại danh sách hiển thị (playlist)
-            search(""); 
-            
-            qDebug() << "Removed song at index:" << index << " Remaining in queue:" << manualQueue.size();
-        }
+    if (currentMode == ShowQueue && index >= 0 && index < manualQueue.size()) {
+        int idToRemove = getSongIdAt(index);
+
+        playbackQueue.removeSong(idToRemove);
+        manualQueue.removeAt(index);
+
+        emit queueCountChanged();  // Cập nhật số lượng queue
+        search(""); // Làm mới danh sách hiển thị
     }
 }
 

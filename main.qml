@@ -66,7 +66,7 @@ ApplicationWindow {
                     }
                     
                     Text {
-                        text: musicController.currentArtist || "Unknown Artist"
+                        text: musicController.currentArtist
                         color: colorPrimary
                         font.pixelSize: 20
                         Layout.fillWidth: true
